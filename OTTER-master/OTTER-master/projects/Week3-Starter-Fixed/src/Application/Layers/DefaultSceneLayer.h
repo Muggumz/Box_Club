@@ -31,6 +31,7 @@ protected:
 	bool moveRight = true;
 	bool moveDown = true;
 	bool moveUp = true;
+	bool Luted = false;
 
 	float currTime = 0.0f;
 	float workload = 0.0f;

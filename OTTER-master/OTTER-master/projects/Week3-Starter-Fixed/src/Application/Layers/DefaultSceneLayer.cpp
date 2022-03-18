@@ -214,17 +214,45 @@ void DefaultSceneLayer::OnUpdate() {
 
 	//Toggle Color Grading Warm
 	if (InputEngine::GetKeyState(GLFW_KEY_8) == ButtonState::Pressed) {
-
+		if (Luted == false)
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/warm.CUBE"));
+			Luted = true;
+		}
+		else
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+			Luted = false;
+		}
+		
 	}
 
 	//Toggle Color Grading Cool
 	if (InputEngine::GetKeyState(GLFW_KEY_9) == ButtonState::Pressed) {
-
+		if (Luted == false)
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/cool.CUBE"));
+			Luted = true;
+		}
+		else
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+			Luted = false;
+		}
 	}
 
 	//Toggle Color Grading Custom Effect
 	if (InputEngine::GetKeyState(GLFW_KEY_0) == ButtonState::Pressed) {
-
+		if (Luted == false)
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/noir.CUBE"));
+			Luted = true;
+		}
+		else
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+			Luted = false;
+		}
 	}
 }
 
@@ -430,6 +458,7 @@ void DefaultSceneLayer::_CreateScene()
 		scene->Lights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 		scene->Lights[0].Range = 100.0f;
 
+		/*
 		scene->Lights[1].Position = glm::vec3(-3.677f, -0.269f, 3.0f);
 		scene->Lights[1].Color = glm::vec3(6.0f, 6.0f, 0.0f);
 		scene->Lights[1].Range = 2.0f;
@@ -445,6 +474,7 @@ void DefaultSceneLayer::_CreateScene()
 		scene->Lights[4].Position = glm::vec3(2.987f, -9.268f, 3.0f);
 		scene->Lights[4].Color = glm::vec3(0.0f, 8.0f, 0.0f);
 		scene->Lights[4].Range = 2.0f;
+		*/
 
 		// We'll create a mesh that is a simple plane that we can resize later
 		MeshResource::Sptr planeMesh = ResourceManager::CreateAsset<MeshResource>();
