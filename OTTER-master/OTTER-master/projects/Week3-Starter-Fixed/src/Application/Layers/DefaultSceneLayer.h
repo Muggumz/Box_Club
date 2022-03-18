@@ -33,6 +33,8 @@ protected:
 	bool moveUp = true;
 
 	float currTime = 0.0f;
+	float workload = 0.0f;
+	int colourpick = 0;
 
 	Gameplay::GameObject::Sptr lightPar;
 };

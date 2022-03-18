@@ -86,7 +86,6 @@ void DefaultSceneLayer::OnAppLoad(const nlohmann::json& config) {
 }
 
 
-
 void DefaultSceneLayer::OnUpdate() {
 	//Update game loop
 	Application& app = Application::Get(); //get application
@@ -163,6 +162,16 @@ void DefaultSceneLayer::OnUpdate() {
 		_currentScene->MainCamera->GetGameObject()->LookAt({ 0, 0, 0 });
 	}
 
+	if (currTime > 0) {
+		currTime -= dt;
+	}
+
+	if (currTime <= 0)
+	{
+		currTime = glm::linearRand(0.5f, 2.0f);
+		
+		colourpick = glm::linearRand(1, 4);
+	}
 
 
 
@@ -416,28 +425,26 @@ void DefaultSceneLayer::_CreateScene()
 		}
 
 		// Create some lights for our scene
-		scene->Lights.resize(3);
-		scene->Lights[0].Position = glm::vec3(0.0f, -6.5f, 12.0f);
+		scene->Lights.resize(5);
+		scene->Lights[0].Position = glm::vec3(0.0f, -6.5f, 24.0f);
 		scene->Lights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 		scene->Lights[0].Range = 100.0f;
 
-		scene->Lights[1].Position = glm::vec3(1.0f, 0.0f, 3.0f);
-		scene->Lights[1].Color = glm::vec3(0.2f, 0.8f, 0.1f);
+		scene->Lights[1].Position = glm::vec3(-3.677f, -0.269f, 3.0f);
+		scene->Lights[1].Color = glm::vec3(6.0f, 6.0f, 0.0f);
+		scene->Lights[1].Range = 2.0f;
 
-		scene->Lights[2].Position = glm::vec3(0.0f, 1.0f, 3.0f);
-		scene->Lights[2].Color = glm::vec3(1.0f, 0.2f, 0.1f);
+		scene->Lights[2].Position = glm::vec3(3.077f, -1.836f, 3.0f);
+		scene->Lights[2].Color = glm::vec3(0.0f, 0.0f, 8.0f);
+		scene->Lights[2].Range = 2.0f;
 
-		//more lightsploz
+		scene->Lights[3].Position = glm::vec3(-4.012f, -8.852f, 3.0f);
+		scene->Lights[3].Color = glm::vec3(8.0f, 0.0f, 0.0f);
+		scene->Lights[3].Range = 2.0f;
 
-		/*
-		GameObject::Sptr strobe1 = scene->CreateGameObject("Strobe1");
-		{
-			strobe1->SetPosition(glm::vec3(1.0f, 1.0f, 1.0f));
-			lightPar->AddChild(strobe1);
-
-			//Light::Sptr lightComponent = light->Add<Light>();
-
-		}*/
+		scene->Lights[4].Position = glm::vec3(2.987f, -9.268f, 3.0f);
+		scene->Lights[4].Color = glm::vec3(0.0f, 8.0f, 0.0f);
+		scene->Lights[4].Range = 2.0f;
 
 		// We'll create a mesh that is a simple plane that we can resize later
 		MeshResource::Sptr planeMesh = ResourceManager::CreateAsset<MeshResource>();
@@ -772,5 +779,8 @@ void DefaultSceneLayer::_CreateScene()
 
 		// Send the scene to the application
 		app.LoadScene(scene);
+
+		
 	}
 }
+
