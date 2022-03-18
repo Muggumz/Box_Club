@@ -32,10 +32,13 @@ protected:
 	bool moveDown = true;
 	bool moveUp = true;
 	bool Luted = false;
+	bool ambientl = false;
+	bool nolight = false;
 
 	float currTime = 0.0f;
 	float workload = 0.0f;
 	int colourpick = 0;
+
 
 	Gameplay::GameObject::Sptr lightPar;
 };

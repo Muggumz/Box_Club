@@ -86,180 +86,13 @@ void DefaultSceneLayer::OnAppLoad(const nlohmann::json& config) {
 }
 
 
-void DefaultSceneLayer::OnUpdate() {
-	//Update game loop
-	Application& app = Application::Get(); //get application
-	_currentScene = app.CurrentScene(); //get The Scene
-
-	//time things
-	float dt = Timing::Current().DeltaTime();
-
-	if (glfwGetKey(app.GetWindow(), GLFW_KEY_A) == GLFW_PRESS) {
-		moveLeft = true;
-	}
-
-	else if (glfwGetKey(app.GetWindow(), GLFW_KEY_A) == GLFW_RELEASE) {
-		moveLeft = false;
-	}
-
-	if (glfwGetKey(app.GetWindow(), GLFW_KEY_D) == GLFW_PRESS) {
-		moveRight = true;
-	}
-
-	else if (glfwGetKey(app.GetWindow(), GLFW_KEY_D) == GLFW_RELEASE) {
-		moveRight = false;
-	}
-
-	if (glfwGetKey(app.GetWindow(), GLFW_KEY_S) == GLFW_PRESS) {
-		moveDown = true;
-	}
-
-	else if (glfwGetKey(app.GetWindow(), GLFW_KEY_S) == GLFW_RELEASE) {
-		moveDown = false;
-	}
-
-	if (glfwGetKey(app.GetWindow(), GLFW_KEY_W) == GLFW_PRESS) {
-		moveUp = true;
-	}
-
-	else if (glfwGetKey(app.GetWindow(), GLFW_KEY_W) == GLFW_RELEASE) {
-		moveUp = false;
-	}
-
-	if (InputEngine::GetKeyState(GLFW_KEY_F) == ButtonState::Pressed) {
-		cameraTest = !cameraTest;
-		std::cout << cameraTest;
-	}
-
-	if (moveLeft == true)
-	{
-		_currentScene->FindObjectByName("player")->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x - (dt*5), _currentScene->FindObjectByName("player")->GetPosition().y, _currentScene->FindObjectByName("player")->GetPosition().z));
-	}
-
-	if (moveRight == true)
-	{
-		_currentScene->FindObjectByName("player")->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x + (dt*5), _currentScene->FindObjectByName("player")->GetPosition().y, _currentScene->FindObjectByName("player")->GetPosition().z));
-	}
-
-	if (moveUp == true)
-	{
-		_currentScene->FindObjectByName("player")->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x, _currentScene->FindObjectByName("player")->GetPosition().y + (dt * 5), _currentScene->FindObjectByName("player")->GetPosition().z));
-	}
-
-	if (moveDown == true)
-	{
-		_currentScene->FindObjectByName("player")->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x, _currentScene->FindObjectByName("player")->GetPosition().y - (dt*5), _currentScene->FindObjectByName("player")->GetPosition().z));
-	}
-
-	if (cameraTest == true)
-	{
-		_currentScene->MainCamera->GetGameObject()->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x, _currentScene->FindObjectByName("player")->GetPosition().y - 3, _currentScene->FindObjectByName("player")->GetPosition().z + 4.5));
-		_currentScene->MainCamera->GetGameObject()->LookAt(_currentScene->FindObjectByName("player")->GetPosition());
-
-	}
-	else {
-		_currentScene->MainCamera->GetGameObject()->SetPosition(glm::vec3(-9, -6, 15));
-		_currentScene->MainCamera->GetGameObject()->LookAt({ 0, 0, 0 });
-	}
-
-	if (currTime > 0) {
-		currTime -= dt;
-	}
-
-	if (currTime <= 0)
-	{
-		currTime = glm::linearRand(0.5f, 2.0f);
-		
-		colourpick = glm::linearRand(1, 4);
-	}
-
-
-
-	//Toggleables
-	
-	//No Lighting
-	if (InputEngine::GetKeyState(GLFW_KEY_1) == ButtonState::Pressed) {
-
-	}
-
-	//Ambient lighting only
-	if (InputEngine::GetKeyState(GLFW_KEY_2) == ButtonState::Pressed) {
-
-	}
-
-	//Specular lighting only
-	if (InputEngine::GetKeyState(GLFW_KEY_3) == ButtonState::Pressed) {
-
-	}
-
-	//Ambient + specular
-	if (InputEngine::GetKeyState(GLFW_KEY_4) == ButtonState::Pressed) {
-
-	}
-
-	//Ambient + Specular + [your custom effect / shader]
-	if (InputEngine::GetKeyState(GLFW_KEY_5) == ButtonState::Pressed) {
-
-	}
-
-	//Toggle diffuse warp/ramo
-	if (InputEngine::GetKeyState(GLFW_KEY_6) == ButtonState::Pressed) {
-
-	}
-
-	//Toggle specular warp/ramp
-	if (InputEngine::GetKeyState(GLFW_KEY_7) == ButtonState::Pressed) {
-
-	}
-
-	//Toggle Color Grading Warm
-	if (InputEngine::GetKeyState(GLFW_KEY_8) == ButtonState::Pressed) {
-		if (Luted == false)
-		{
-			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/warm.CUBE"));
-			Luted = true;
-		}
-		else
-		{
-			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
-			Luted = false;
-		}
-		
-	}
-
-	//Toggle Color Grading Cool
-	if (InputEngine::GetKeyState(GLFW_KEY_9) == ButtonState::Pressed) {
-		if (Luted == false)
-		{
-			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/cool.CUBE"));
-			Luted = true;
-		}
-		else
-		{
-			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
-			Luted = false;
-		}
-	}
-
-	//Toggle Color Grading Custom Effect
-	if (InputEngine::GetKeyState(GLFW_KEY_0) == ButtonState::Pressed) {
-		if (Luted == false)
-		{
-			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/noir.CUBE"));
-			Luted = true;
-		}
-		else
-		{
-			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
-			Luted = false;
-		}
-	}
-}
 
 void DefaultSceneLayer::_CreateScene()
 {
 	using namespace Gameplay;
 	using namespace Gameplay::Physics;
+
+	
 
 	Application& app = Application::Get();
 
@@ -814,3 +647,176 @@ void DefaultSceneLayer::_CreateScene()
 	}
 }
 
+
+void DefaultSceneLayer::OnUpdate() {
+	//Update game loop
+	Application& app = Application::Get(); //get application
+	_currentScene = app.CurrentScene(); //get The Scene
+
+
+	//time things
+	float dt = Timing::Current().DeltaTime();
+
+	if (glfwGetKey(app.GetWindow(), GLFW_KEY_A) == GLFW_PRESS) {
+		moveLeft = true;
+	}
+
+	else if (glfwGetKey(app.GetWindow(), GLFW_KEY_A) == GLFW_RELEASE) {
+		moveLeft = false;
+	}
+
+	if (glfwGetKey(app.GetWindow(), GLFW_KEY_D) == GLFW_PRESS) {
+		moveRight = true;
+	}
+
+	else if (glfwGetKey(app.GetWindow(), GLFW_KEY_D) == GLFW_RELEASE) {
+		moveRight = false;
+	}
+
+	if (glfwGetKey(app.GetWindow(), GLFW_KEY_S) == GLFW_PRESS) {
+		moveDown = true;
+	}
+
+	else if (glfwGetKey(app.GetWindow(), GLFW_KEY_S) == GLFW_RELEASE) {
+		moveDown = false;
+	}
+
+	if (glfwGetKey(app.GetWindow(), GLFW_KEY_W) == GLFW_PRESS) {
+		moveUp = true;
+	}
+
+	else if (glfwGetKey(app.GetWindow(), GLFW_KEY_W) == GLFW_RELEASE) {
+		moveUp = false;
+	}
+
+	if (InputEngine::GetKeyState(GLFW_KEY_F) == ButtonState::Pressed) {
+		cameraTest = !cameraTest;
+		std::cout << cameraTest;
+	}
+
+	if (moveLeft == true)
+	{
+		_currentScene->FindObjectByName("player")->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x - (dt * 5), _currentScene->FindObjectByName("player")->GetPosition().y, _currentScene->FindObjectByName("player")->GetPosition().z));
+	}
+
+	if (moveRight == true)
+	{
+		_currentScene->FindObjectByName("player")->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x + (dt * 5), _currentScene->FindObjectByName("player")->GetPosition().y, _currentScene->FindObjectByName("player")->GetPosition().z));
+	}
+
+	if (moveUp == true)
+	{
+		_currentScene->FindObjectByName("player")->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x, _currentScene->FindObjectByName("player")->GetPosition().y + (dt * 5), _currentScene->FindObjectByName("player")->GetPosition().z));
+	}
+
+	if (moveDown == true)
+	{
+		_currentScene->FindObjectByName("player")->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x, _currentScene->FindObjectByName("player")->GetPosition().y - (dt * 5), _currentScene->FindObjectByName("player")->GetPosition().z));
+	}
+
+	if (cameraTest == true)
+	{
+		_currentScene->MainCamera->GetGameObject()->SetPosition(glm::vec3(_currentScene->FindObjectByName("player")->GetPosition().x, _currentScene->FindObjectByName("player")->GetPosition().y - 3, _currentScene->FindObjectByName("player")->GetPosition().z + 4.5));
+		_currentScene->MainCamera->GetGameObject()->LookAt(_currentScene->FindObjectByName("player")->GetPosition());
+
+	}
+	else {
+		_currentScene->MainCamera->GetGameObject()->SetPosition(glm::vec3(-9, -6, 15));
+		_currentScene->MainCamera->GetGameObject()->LookAt({ 0, 0, 0 });
+	}
+
+	if (currTime > 0) {
+		currTime -= dt;
+	}
+
+	if (currTime <= 0)
+	{
+		currTime = glm::linearRand(0.5f, 2.0f);
+
+		colourpick = glm::linearRand(1, 4);
+	}
+
+
+
+	//Toggleables
+
+	//No Lighting
+	if (InputEngine::GetKeyState(GLFW_KEY_1) == ButtonState::Pressed) {
+		app.CurrentScene()->SetAmbientLight(glm::vec3(0.0f));
+
+	}
+
+	//Ambient lighting only
+	if (InputEngine::GetKeyState(GLFW_KEY_2) == ButtonState::Pressed) {
+			app.CurrentScene()->SetAmbientLight(glm::vec3(0.1f));
+
+	}
+
+	//Specular lighting only
+	if (InputEngine::GetKeyState(GLFW_KEY_3) == ButtonState::Pressed) {
+		app.CurrentScene()->SetAmbientLight(glm::vec3(0.0f));
+	}
+
+	//Ambient + specular
+	if (InputEngine::GetKeyState(GLFW_KEY_4) == ButtonState::Pressed) {
+		app.CurrentScene()->SetAmbientLight(glm::vec3(0.1f));
+	}
+
+	//Ambient + Specular + [your custom effect / shader]
+	if (InputEngine::GetKeyState(GLFW_KEY_5) == ButtonState::Pressed) {
+		app.CurrentScene()->SetAmbientLight(glm::vec3(0.1f));
+	}
+
+	//Toggle diffuse warp/ramo
+	if (InputEngine::GetKeyState(GLFW_KEY_6) == ButtonState::Pressed) {
+
+	}
+
+	//Toggle specular warp/ramp
+	if (InputEngine::GetKeyState(GLFW_KEY_7) == ButtonState::Pressed) {
+
+	}
+
+	//Toggle Color Grading Warm
+	if (InputEngine::GetKeyState(GLFW_KEY_8) == ButtonState::Pressed) {
+		if (Luted == false)
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/warm.CUBE"));
+			Luted = true;
+		}
+		else
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+			Luted = false;
+		}
+
+	}
+
+	//Toggle Color Grading Cool
+	if (InputEngine::GetKeyState(GLFW_KEY_9) == ButtonState::Pressed) {
+		if (Luted == false)
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/cool.CUBE"));
+			Luted = true;
+		}
+		else
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+			Luted = false;
+		}
+	}
+
+	//Toggle Color Grading Custom Effect
+	if (InputEngine::GetKeyState(GLFW_KEY_0) == ButtonState::Pressed) {
+		if (Luted == false)
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/noir.CUBE"));
+			Luted = true;
+		}
+		else
+		{
+			app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+			Luted = false;
+		}
+	}
+}
