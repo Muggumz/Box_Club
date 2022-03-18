@@ -167,6 +167,7 @@ void DefaultSceneLayer::_CreateScene()
 		Texture2D::Sptr    boxSpec      = ResourceManager::CreateAsset<Texture2D>("textures/box-specular.png");
 		Texture2D::Sptr    monkeyTex    = ResourceManager::CreateAsset<Texture2D>("textures/monkey-uvMap.png");
 		Texture2D::Sptr    leafTex      = ResourceManager::CreateAsset<Texture2D>("textures/leaves.png");
+		Texture2D::Sptr    woodTex      = ResourceManager::CreateAsset<Texture2D>("textures/wood.png");
 		leafTex->SetMinFilter(MinFilter::Nearest);
 		leafTex->SetMagFilter(MagFilter::Nearest);
 
@@ -183,7 +184,7 @@ void DefaultSceneLayer::_CreateScene()
 		});
 
 		// Create an empty scene
-		Scene::Sptr scene = std::make_shared<Scene>(); 
+		Scene::Sptr scene = std::make_shared<Scene>();
 
 		// Setting up our enviroment map
 		scene->SetSkyboxTexture(testCubemap); 
@@ -206,6 +207,13 @@ void DefaultSceneLayer::_CreateScene()
 			boxMaterial->Set("u_Material.Shininess", 0.1f);
 		}
 
+		Material::Sptr platMaterial = ResourceManager::CreateAsset<Material>(basicShader);
+		{
+			platMaterial->Name = "Wood";
+			platMaterial->Set("u_Material.Diffuse", woodTex);
+			platMaterial->Set("u_Material.Shininess", 0.1f);
+		}
+
 		// This will be the reflective material, we'll make the whole thing 90% reflective
 		Material::Sptr monkeyMaterial = ResourceManager::CreateAsset<Material>(reflectiveShader);
 		{
@@ -220,6 +228,21 @@ void DefaultSceneLayer::_CreateScene()
 			testMaterial->Name = "Box-Specular";
 			testMaterial->Set("u_Material.Diffuse", boxTexture);
 			testMaterial->Set("u_Material.Specular", boxSpec);
+		}
+
+		// because a dj should be shmooving
+		Material::Sptr djMaterial = ResourceManager::CreateAsset<Material>(foliageShader);
+		{
+			djMaterial->Name = "dj Shader";
+			djMaterial->Set("u_Material.Diffuse", boxTexture);
+			djMaterial->Set("u_Material.Specular", boxSpec);
+			djMaterial->Set("u_Material.Shininess", 0.1f);
+			djMaterial->Set("u_Material.Threshold", 0.1f);
+
+			djMaterial->Set("u_WindDirection", glm::vec3(0.0f, 1.0f, 0.5f));
+			djMaterial->Set("u_WindStrength", 0.5f);
+			djMaterial->Set("u_VerticalScale", 1.0f);
+			djMaterial->Set("u_WindSpeed", 9.0f);
 		}
 
 		// Our foliage vertex shader material
@@ -291,7 +314,7 @@ void DefaultSceneLayer::_CreateScene()
 		scene->Lights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 		scene->Lights[0].Range = 100.0f;
 
-		/*
+		
 		scene->Lights[1].Position = glm::vec3(-3.677f, -0.269f, 3.0f);
 		scene->Lights[1].Color = glm::vec3(6.0f, 6.0f, 0.0f);
 		scene->Lights[1].Range = 2.0f;
@@ -307,7 +330,7 @@ void DefaultSceneLayer::_CreateScene()
 		scene->Lights[4].Position = glm::vec3(2.987f, -9.268f, 3.0f);
 		scene->Lights[4].Color = glm::vec3(0.0f, 8.0f, 0.0f);
 		scene->Lights[4].Range = 2.0f;
-		*/
+		
 
 		// We'll create a mesh that is a simple plane that we can resize later
 		MeshResource::Sptr planeMesh = ResourceManager::CreateAsset<MeshResource>();
@@ -376,6 +399,7 @@ void DefaultSceneLayer::_CreateScene()
 		}
 		*/
 		GameObject::Sptr demoBase = scene->CreateGameObject("Demo Parent");
+		demoBase->SetPosition(glm::vec3(20, 0, 0));
 
 		// Box to showcase the specular material
 		GameObject::Sptr specBox = scene->CreateGameObject("Specular Object");
@@ -608,7 +632,7 @@ void DefaultSceneLayer::_CreateScene()
 			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
 			cubeMesh->GenerateMesh();
 
-			player->SetPosition(glm::vec3(1.5f, 0.f, 1.f));
+			player->SetPosition(glm::vec3(0.f, -10.f, 1.f));
 			player->SetScale(glm::vec3(1.5f));
 
 			RenderComponent::Sptr renderer = player->Add<RenderComponent>();
@@ -625,6 +649,197 @@ void DefaultSceneLayer::_CreateScene()
 			playerLight->SetIntensity(1.0f);
 			*/
 		}
+
+		GameObject::Sptr crowdBase = scene->CreateGameObject("Crowd");
+
+		GameObject::Sptr person1 = scene->CreateGameObject("person1");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			person1->SetPosition(glm::vec3(-4.68f, -3.980f, 1.f));
+			person1->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = person1->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(testMaterial);
+
+			RigidBody::Sptr physics = person1->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+			crowdBase->AddChild(person1);
+		}
+
+		GameObject::Sptr person2 = scene->CreateGameObject("person2");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			person2->SetPosition(glm::vec3(2.240f, -7.360f, 1.f));
+			person2->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = person2->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(testMaterial);
+
+			RigidBody::Sptr physics = person2->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+			crowdBase->AddChild(person2);
+		}
+
+		GameObject::Sptr person3 = scene->CreateGameObject("person3");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			person3->SetPosition(glm::vec3(4.33f, -5.14f, 1.f));
+			person3->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = person3->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(testMaterial);
+
+			RigidBody::Sptr physics = person3->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+			crowdBase->AddChild(person3);
+		}
+
+		GameObject::Sptr person4 = scene->CreateGameObject("person4");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			person4->SetPosition(glm::vec3(-2.350f, -9.12f, 1.f));
+			person4->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = person4->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(testMaterial);
+
+			RigidBody::Sptr physics = person4->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+			crowdBase->AddChild(person4);
+		}
+
+		GameObject::Sptr person5 = scene->CreateGameObject("person5");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			person5->SetPosition(glm::vec3(4.66f, -9.02f, 1.f));
+			person5->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = person5->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(testMaterial);
+
+			RigidBody::Sptr physics = person5->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+			crowdBase->AddChild(person5);
+		}
+
+		GameObject::Sptr person6 = scene->CreateGameObject("person6");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			person6->SetPosition(glm::vec3(-4.f, -11.880f, 1.f));
+			person6->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = person6->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(testMaterial);
+
+			RigidBody::Sptr physics = person6->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+			crowdBase->AddChild(person6);
+		}
+
+		GameObject::Sptr person7 = scene->CreateGameObject("person7");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			person7->SetPosition(glm::vec3(1.825f, -3.028f, 1.f));
+			person7->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = person7->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(testMaterial);
+
+			RigidBody::Sptr physics = person7->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+			crowdBase->AddChild(person7);
+		}
+
+		GameObject::Sptr person8 = scene->CreateGameObject("person8");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			person8->SetPosition(glm::vec3(-5.755f, -7.937f, 1.f));
+			person8->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = person8->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(testMaterial);
+
+			RigidBody::Sptr physics = person8->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+			crowdBase->AddChild(person8);
+		}
+
+		GameObject::Sptr dj = scene->CreateGameObject("dj");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			dj->SetPosition(glm::vec3(0.f, 1.139f, 2.3f));
+			dj->SetScale(glm::vec3(1.5f));
+
+			RenderComponent::Sptr renderer = dj->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(djMaterial);
+
+			RigidBody::Sptr physics = dj->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+		}
+
+		GameObject::Sptr platform = scene->CreateGameObject("platform");
+		{
+			MeshResource::Sptr cubeMesh = ResourceManager::CreateAsset<MeshResource>();
+			cubeMesh->AddParam(MeshBuilderParam::CreateCube(ZERO, ONE));
+			cubeMesh->GenerateMesh();
+
+			platform->SetPosition(glm::vec3(0.0f, 1.5f, 1.f));
+			platform->SetScale(glm::vec3(10.f, 5.f, 1.f));
+
+			RenderComponent::Sptr renderer = platform->Add<RenderComponent>();
+			renderer->SetMesh(cubeMesh);
+			renderer->SetMaterial(platMaterial);
+
+			RigidBody::Sptr physics = platform->Add<RigidBody>();
+			physics->AddCollider(BoxCollider::Create());
+
+		}
+
+
 
 		GameObject::Sptr particles = scene->CreateGameObject("Particles");
 		{
@@ -736,35 +951,316 @@ void DefaultSceneLayer::OnUpdate() {
 		colourpick = glm::linearRand(1, 4);
 	}
 
+	//if time > 0 go down
+	//if time 0, jump for period of time
+	//after period of time make new time before jump again
+	
+	//le super scuffed jumps
 
+	//box1jump
+	if (jump1 > 0 && jumping1 == false && jumped1 == false)
+		{
+			jump1 -= dt;
+		}
+
+	if (jump1 <= 0 && jumping1 == false)
+	{
+		jumping1 = true;
+		jump1 = 0.2;
+	}
+
+	if (jumping1 == true && _currentScene->FindObjectByName("person1")->GetPosition().z < 1.5)
+	{
+		_currentScene->FindObjectByName("person1")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person1")->GetPosition().x, _currentScene->FindObjectByName("person1")->GetPosition().y, _currentScene->FindObjectByName("person1")->GetPosition().z + (dt * 4)));
+
+	}
+	else if (jumping1 == true && _currentScene->FindObjectByName("person1")->GetPosition().z >= 1.5)
+	{
+		jumped1 = true;
+		jumping1 = false;
+	}
+
+	if (jumped1 == true && _currentScene->FindObjectByName("person1")->GetPosition().z > 1)
+	{
+		_currentScene->FindObjectByName("person1")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person1")->GetPosition().x, _currentScene->FindObjectByName("person1")->GetPosition().y, _currentScene->FindObjectByName("person1")->GetPosition().z - (dt * 4)));
+	}
+	else if (jumped1 == true && _currentScene->FindObjectByName("person1")->GetPosition().z <= 1)
+	{
+		jumped1 = false;
+		jump1 = glm::linearRand(0.1f, 0.5f);
+	}
+
+	// box2jump
+	if (jump2 > 0 && jumping2 == false && jumped2 == false)
+	{
+		jump2 -= dt;
+	}
+
+	if (jump2 <= 0 && jumping2 == false)
+	{
+		jumping2 = true;
+		jump2 = 0.2;
+	}
+
+	if (jumping2 == true && _currentScene->FindObjectByName("person2")->GetPosition().z < 1.5)
+	{
+		_currentScene->FindObjectByName("person2")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person2")->GetPosition().x, _currentScene->FindObjectByName("person2")->GetPosition().y, _currentScene->FindObjectByName("person2")->GetPosition().z + (dt * 4)));
+
+	}
+	else if (jumping2 == true && _currentScene->FindObjectByName("person2")->GetPosition().z >= 1.5)
+	{
+		jumped2 = true;
+		jumping2 = false;
+	}
+
+	if (jumped2 == true && _currentScene->FindObjectByName("person2")->GetPosition().z > 1)
+	{
+		_currentScene->FindObjectByName("person2")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person2")->GetPosition().x, _currentScene->FindObjectByName("person2")->GetPosition().y, _currentScene->FindObjectByName("person2")->GetPosition().z - (dt * 4)));
+	}
+	else if (jumped2 == true && _currentScene->FindObjectByName("person2")->GetPosition().z <= 1)
+	{
+		jumped2 = false;
+		jump2 = glm::linearRand(0.1f, 0.5f);
+	}
+
+	//box3jump
+	if (jump3 > 0 && jumping3 == false && jumped3 == false)
+	{
+		jump3 -= dt;
+	}
+
+	if (jump3 <= 0 && jumping3 == false)
+	{
+		jumping3 = true;
+		jump3 = 0.2;
+	}
+
+	if (jumping3 == true && _currentScene->FindObjectByName("person3")->GetPosition().z < 1.5)
+	{
+		_currentScene->FindObjectByName("person3")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person3")->GetPosition().x, _currentScene->FindObjectByName("person3")->GetPosition().y, _currentScene->FindObjectByName("person3")->GetPosition().z + (dt * 4)));
+
+	}
+	else if (jumping3 == true && _currentScene->FindObjectByName("person3")->GetPosition().z >= 1.5)
+	{
+		jumped3 = true;
+		jumping3 = false;
+	}
+
+	if (jumped3 == true && _currentScene->FindObjectByName("person3")->GetPosition().z > 1)
+	{
+		_currentScene->FindObjectByName("person3")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person3")->GetPosition().x, _currentScene->FindObjectByName("person3")->GetPosition().y, _currentScene->FindObjectByName("person3")->GetPosition().z - (dt * 4)));
+	}
+	else if (jumped3 == true && _currentScene->FindObjectByName("person3")->GetPosition().z <= 1)
+	{
+		jumped3 = false;
+		jump3 = glm::linearRand(0.1f, 0.5f);
+	}
+
+	//box4jump
+
+	if (jump4 > 0 && jumping4 == false && jumped4 == false)
+	{
+		jump4 -= dt;
+	}
+
+	if (jump4 <= 0 && jumping4 == false)
+	{
+		jumping4 = true;
+		jump4 = 0.2;
+	}
+
+	if (jumping4 == true && _currentScene->FindObjectByName("person4")->GetPosition().z < 1.5)
+	{
+		_currentScene->FindObjectByName("person4")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person4")->GetPosition().x, _currentScene->FindObjectByName("person4")->GetPosition().y, _currentScene->FindObjectByName("person4")->GetPosition().z + (dt * 4)));
+
+	}
+	else if (jumping4 == true && _currentScene->FindObjectByName("person4")->GetPosition().z >= 1.5)
+	{
+		jumped4 = true;
+		jumping4 = false;
+	}
+
+	if (jumped4 == true && _currentScene->FindObjectByName("person4")->GetPosition().z > 1)
+	{
+		_currentScene->FindObjectByName("person4")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person4")->GetPosition().x, _currentScene->FindObjectByName("person4")->GetPosition().y, _currentScene->FindObjectByName("person4")->GetPosition().z - (dt * 4)));
+	}
+	else if (jumped4 == true && _currentScene->FindObjectByName("person4")->GetPosition().z <= 1)
+	{
+		jumped4 = false;
+		jump4 = glm::linearRand(0.1f, 0.5f);
+	}
+
+	//box5jump
+	if (jump5 > 0 && jumping5 == false && jumped5 == false)
+	{
+		jump5 -= dt;
+	}
+
+	if (jump5 <= 0 && jumping5 == false)
+	{
+		jumping5 = true;
+		jump5 = 0.2;
+	}
+
+	if (jumping5 == true && _currentScene->FindObjectByName("person5")->GetPosition().z < 1.5)
+	{
+		_currentScene->FindObjectByName("person5")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person5")->GetPosition().x, _currentScene->FindObjectByName("person5")->GetPosition().y, _currentScene->FindObjectByName("person5")->GetPosition().z + (dt * 4)));
+
+	}
+	else if (jumping5 == true && _currentScene->FindObjectByName("person5")->GetPosition().z >= 1.5)
+	{
+		jumped5 = true;
+		jumping5 = false;
+	}
+
+	if (jumped5 == true && _currentScene->FindObjectByName("person5")->GetPosition().z > 1)
+	{
+		_currentScene->FindObjectByName("person5")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person5")->GetPosition().x, _currentScene->FindObjectByName("person5")->GetPosition().y, _currentScene->FindObjectByName("person5")->GetPosition().z - (dt * 4)));
+	}
+	else if (jumped5 == true && _currentScene->FindObjectByName("person5")->GetPosition().z <= 1)
+	{
+		jumped5 = false;
+		jump5 = glm::linearRand(0.1f, 0.5f);
+	}
+
+	//box6jump
+	if (jump6 > 0 && jumping6 == false && jumped6 == false)
+	{
+		jump6 -= dt;
+	}
+
+	if (jump6 <= 0 && jumping6 == false)
+	{
+		jumping6 = true;
+		jump6 = 0.2;
+	}
+
+	if (jumping6 == true && _currentScene->FindObjectByName("person6")->GetPosition().z < 1.5)
+	{
+		_currentScene->FindObjectByName("person6")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person6")->GetPosition().x, _currentScene->FindObjectByName("person6")->GetPosition().y, _currentScene->FindObjectByName("person6")->GetPosition().z + (dt * 4)));
+
+	}
+	else if (jumping6 == true && _currentScene->FindObjectByName("person1")->GetPosition().z >= 1.5)
+	{
+		jumped6 = true;
+		jumping6 = false;
+	}
+
+	if (jumped6 == true && _currentScene->FindObjectByName("person6")->GetPosition().z > 1)
+	{
+		_currentScene->FindObjectByName("person6")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person6")->GetPosition().x, _currentScene->FindObjectByName("person6")->GetPosition().y, _currentScene->FindObjectByName("person6")->GetPosition().z - (dt * 4)));
+	}
+	else if (jumped6 == true && _currentScene->FindObjectByName("person6")->GetPosition().z <= 1)
+	{
+		jumped6 = false;
+		jump6 = glm::linearRand(0.1f, 0.5f);
+	}
+
+	//box7jump
+	if (jump7 > 0 && jumping7 == false && jumped7 == false)
+	{
+		jump7 -= dt;
+	}
+
+	if (jump7 <= 0 && jumping7 == false)
+	{
+		jumping7 = true;
+		jump7 = 0.2;
+	}
+
+	if (jumping7 == true && _currentScene->FindObjectByName("person7")->GetPosition().z < 1.5)
+	{
+		_currentScene->FindObjectByName("person7")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person7")->GetPosition().x, _currentScene->FindObjectByName("person7")->GetPosition().y, _currentScene->FindObjectByName("person7")->GetPosition().z + (dt * 4)));
+
+	}
+	else if (jumping7 == true && _currentScene->FindObjectByName("person7")->GetPosition().z >= 1.5)
+	{
+		jumped7 = true;
+		jumping7 = false;
+	}
+
+	if (jumped7 == true && _currentScene->FindObjectByName("person7")->GetPosition().z > 1)
+	{
+		_currentScene->FindObjectByName("person7")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person7")->GetPosition().x, _currentScene->FindObjectByName("person7")->GetPosition().y, _currentScene->FindObjectByName("person7")->GetPosition().z - (dt * 4)));
+	}
+	else if (jumped7 == true && _currentScene->FindObjectByName("person7")->GetPosition().z <= 1)
+	{
+		jumped7 = false;
+		jump7 = glm::linearRand(0.1f, 0.5f);
+	}
+
+	//box8jump
+	if (jump8 > 0 && jumping8 == false && jumped8 == false)
+	{
+		jump8 -= dt;
+	}
+
+	if (jump8 <= 0 && jumping8 == false)
+	{
+		jumping8 = true;
+		jump8 = 0.2;
+	}
+
+	if (jumping8 == true && _currentScene->FindObjectByName("person8")->GetPosition().z < 1.5)
+	{
+		_currentScene->FindObjectByName("person8")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person8")->GetPosition().x, _currentScene->FindObjectByName("person8")->GetPosition().y, _currentScene->FindObjectByName("person8")->GetPosition().z + (dt * 4)));
+
+	}
+	else if (jumping8 == true && _currentScene->FindObjectByName("person8")->GetPosition().z >= 1.5)
+	{
+		jumped8 = true;
+		jumping8 = false;
+	}
+
+	if (jumped8 == true && _currentScene->FindObjectByName("person8")->GetPosition().z > 1)
+	{
+		_currentScene->FindObjectByName("person8")->SetPosition(glm::vec3(_currentScene->FindObjectByName("person8")->GetPosition().x, _currentScene->FindObjectByName("person8")->GetPosition().y, _currentScene->FindObjectByName("person8")->GetPosition().z - (dt * 4)));
+	}
+	else if (jumped8 == true && _currentScene->FindObjectByName("person8")->GetPosition().z <= 1)
+	{
+		jumped8 = false;
+		jump8 = glm::linearRand(0.1f, 0.5f);
+	}
 
 	//Toggleables
+
+	
 
 	//No Lighting
 	if (InputEngine::GetKeyState(GLFW_KEY_1) == ButtonState::Pressed) {
 		app.CurrentScene()->SetAmbientLight(glm::vec3(0.0f));
+		app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+		Luted = false;
 
 	}
 
 	//Ambient lighting only
 	if (InputEngine::GetKeyState(GLFW_KEY_2) == ButtonState::Pressed) {
-			app.CurrentScene()->SetAmbientLight(glm::vec3(0.1f));
+		app.CurrentScene()->SetAmbientLight(glm::vec3(0.1f));
+		app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+		Luted = false;
 
 	}
 
 	//Specular lighting only
 	if (InputEngine::GetKeyState(GLFW_KEY_3) == ButtonState::Pressed) {
 		app.CurrentScene()->SetAmbientLight(glm::vec3(0.0f));
+		app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+		Luted = false;
 	}
 
 	//Ambient + specular
 	if (InputEngine::GetKeyState(GLFW_KEY_4) == ButtonState::Pressed) {
 		app.CurrentScene()->SetAmbientLight(glm::vec3(0.1f));
+		app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/plain.CUBE"));
+		Luted = false;
 	}
 
 	//Ambient + Specular + [your custom effect / shader]
 	if (InputEngine::GetKeyState(GLFW_KEY_5) == ButtonState::Pressed) {
 		app.CurrentScene()->SetAmbientLight(glm::vec3(0.1f));
+		app.CurrentScene()->SetColorLUT(ResourceManager::CreateAsset<Texture3D>("luts/noir.CUBE"));
+		Luted = true;
 	}
 
 	//Toggle diffuse warp/ramo
@@ -819,4 +1315,6 @@ void DefaultSceneLayer::OnUpdate() {
 			Luted = false;
 		}
 	}
+
+	
 }
